@@ -12,6 +12,7 @@ const {Row, Col} = require('react-bootstrap');
 const ComboField = require('./ComboField');
 const assign = require('object-assign');
 const LocaleUtils = require('../../MapStore2/web/client/utils/LocaleUtils');
+const Slider = require('react-nouislider');
 
 class FilterField extends React.Component {
     static propTypes = {
@@ -93,6 +94,11 @@ class FilterField extends React.Component {
                     <Col xs={this.props.deleteButton ? 2 : 3}>{selectedAttribute ? this.renderOperatorField() : null}</Col>
                     <Col xs={5}>{selectedAttribute && this.props.filterField.operator ? this.renderValueField(selectedAttribute) : null}</Col>
                     {this.props.deleteButton ? <Col xs={1}>{this.props.deleteButton}</Col> : null}
+                    <Col> 
+                    <Slider 
+                    start={[127,10000]}
+                    range={{ min: 0, max: 255}}/> 
+                     </Col>
                 </Row>
             </div>
         );

@@ -14,6 +14,7 @@ const OverlayTrigger = require('../../MapStore2/web/client/components/misc/Overl
 
 const FilterField = require('./FilterField');
 const ComboField = require('./ComboField');
+
 const DateField = require('../../MapStore2/web/client/components/data/query/DateField');
 const NumberField = require('../../MapStore2/web/client/components/data/query/NumberField');
 const TextField = require('../../MapStore2/web/client/components/data/query/TextField');

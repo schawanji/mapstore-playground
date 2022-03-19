@@ -39,7 +39,7 @@ const {isEqual} = require('lodash');
 const LayersUtils = require('../../MapStore2/web/client/utils/LayersUtils');
 
 // include application component
-const QueryBuilder = require('../../MapStore2/web/client/components/data/query/QueryBuilder');
+const QueryBuilder = require('../components/QueryBuilder');
 const QueryPanelHeader = require('../../MapStore2/web/client/components/data/query/QueryPanelHeader');
 const {featureTypeSelectedEpic, wfsQueryEpic, viewportSelectedEpic, redrawSpatialFilterEpic} = require('../../MapStore2/web/client/epics/wfsquery');
 const autocompleteEpics = require('../../MapStore2/web/client/epics/autocomplete');

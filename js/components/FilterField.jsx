@@ -43,118 +43,60 @@ class FilterField extends React.Component {
         onChangeCascadingValue: () => {},
         fieldName: null,
         fieldValue: null,
-        state: [0, 50],
+        
     };
+    
+    state ={lowBound:100000, upBound:4000000000};
 
+     addOperator = () => {
+        let fieldOptions = this.props.operatorOptions.map((operator) => {
+            return operator;
+        });
+
+        this.updateFieldElement(
+            this.props.filterField.rowId,
+            "operator",
+            this.props.operatorOptions[6],
+            undefined,
+            fieldOptions
+        );
+    };
     
 
+    updateSliderValues = (values) => {
+        this.setState({lowBound:values[0], upBound:values[1]})
+        this.addOperator(); 
+        let fieldOptions;
+         this.updateFieldElement(
+            this.props.filterField.rowId,
+            "value",
+            { lowBound: values[0], upBound: values[1] },
+            "number",
+            fieldOptions
+        );
+    };
+
+   
+
     render() {
-        renderOperatorField = () => {
+        addSliderFilter = () => {
             return (
                 <Slider
-                    range={{ min: 0, max: 1000000 }}
-                    start={[0, 1000000]}
-                    format={{
-                        from: (value) => Math.round(value),
-                        to: (value) => Math.round(value),
-                    }}
-                    
-                    margin={30}
-                    tooltips
-                    onSlide={(values, event) => {
-                        addOperator();
-                        onButtonClicked(values);
-                    }}
+                range={{ min: 0, max: 800000 }}
+                start={[this.state.lowBound, this.state.upBound]} 
+                format={{
+                    from: (value) => Math.round(value),
+                    to: (value) => Math.round(value),
+                }}
+                margin={30}
+                onSlide={this.updateSliderValues.bind(this)}
+                tooltips
                 />
             );
         };
 
-        const addOperator = () => {
-            let attType = undefined;
-            let fieldName = this.props.operatorOptions[6];
-            let fieldRowId = this.props.filterField.rowId;
-            let name = "operator";
-            let fieldOptions = this.props.operatorOptions.map((attribute) => {
-                return attribute;
-            });
-
-            this.updateFieldElement(
-                fieldRowId,
-                name,
-                fieldName,
-                attType,
-                fieldOptions
-            );
-        };
-        const addAttribute = () => {
-            let selectedAttribute = this.props.attributes[7].attribute;
-            let attType = selectedAttribute && selectedAttribute.type;
-            let fieldName = this.props.attributes[7].attribute;
-            let fieldRowId = this.props.filterField.rowId;
-            let name = "attribute";
-            let fieldOptions = this.props.attributes.map((attribute) => {
-                return { id: attribute.attribute, name: attribute.label };
-            });
-
-            this.updateFieldElement(
-                fieldRowId,
-                name,
-                fieldName,
-                attType,
-                fieldOptions
-            );
-            addOperator();
-        };
-        const addLowerValue = (event) => {
-            let selectedValue = "number";
-            let attType = `values`;
-            let fieldName = { lowBound: event.target.value };
-            let fieldRowId = this.props.filterField.rowId;
-            let name = "value";
-            let fieldOptions;
-
-            this.updateFieldElement(
-                fieldRowId,
-                name,
-                fieldName,
-                selectedValue,
-                fieldOptions
-            );
-        };
-
-        const addUpperValue = (event) => {
-            let selectedValue = "number";
-            let attType = `values`;
-            let fieldName = { upBound: event.target.value };
-            let fieldRowId = this.props.filterField.rowId;
-            let name = "value";
-            let fieldOptions;
-
-            this.updateFieldElement(
-                fieldRowId,
-                name,
-                fieldName,
-                selectedValue,
-                fieldOptions
-            );
-        };
-
-        const onButtonClicked = (values) => {
-            let selectedValue = "number";
-            let attType = `values`;
-            let fieldName = { lowBound: values[0], upBound: values[1] };
-            let fieldRowId = this.props.filterField.rowId;
-            let name = "value";
-            let fieldOptions;
-
-            this.updateFieldElement(
-                fieldRowId,
-                name,
-                fieldName,
-                selectedValue,
-                fieldOptions
-            );
-        };
+      
+        
 
         let selectedAttribute = this.props.attributes.filter(
             (attribute) =>
@@ -163,10 +105,8 @@ class FilterField extends React.Component {
 
         return (
             <div className="container-fluid">
-                
-
-
                 <Row>
+                <Col xs={11}>
                     <ComboField
                         valueField={"id"}
                         textField={"name"}
@@ -187,9 +127,14 @@ class FilterField extends React.Component {
                         onUpdateField={this.updateFieldElement}
                         comboFilter={"contains"}
                     />
+                </Col>
+                    {this.props.deleteButton ? <Col xs={1}>{this.props.deleteButton}</Col> : null}
                 </Row>
 
-                <Row>{selectedAttribute && selectedAttribute.type==="number" ? renderOperatorField() : null}</Row>
+                <Row> 
+                    <Col xs={10}>{selectedAttribute && selectedAttribute.type==="number" ? addSliderFilter() : null}</Col> 
+                </Row>
+                
             </div>
         );
     }

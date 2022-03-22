@@ -1,4 +1,4 @@
-const PropTypes = require('prop-types');
+const PropTypes = require("prop-types");
 /**
  * Copyright 2016, GeoSolutions Sas.
  * All rights reserved.
@@ -6,13 +6,15 @@ const PropTypes = require('prop-types');
  * This source code is licensed under the BSD-style license found in the
  * LICENSE file in the root directory of this source tree.
  */
-const React = require('react');
-const {Row, Col} = require('react-bootstrap');
+const React = require("react");
 
-const ComboField = require('./ComboField');
-const assign = require('object-assign');
-const LocaleUtils = require('../../MapStore2/web/client/utils/LocaleUtils');
-const Slider = require('react-nouislider');
+const { Row, Col } = require("react-bootstrap");
+
+const ComboField = require("./ComboField");
+const assign = require("object-assign");
+const LocaleUtils = require("../../MapStore2/web/client/utils/LocaleUtils");
+
+const Slider = require("react-nouislider");
 
 class FilterField extends React.Component {
     static propTypes = {
@@ -24,11 +26,11 @@ class FilterField extends React.Component {
         toggleMenu: PropTypes.func,
         deleteButton: PropTypes.node,
         onUpdateExceptionField: PropTypes.func,
-        onChangeCascadingValue: PropTypes.func
+        onChangeCascadingValue: PropTypes.func,
     };
 
     static contextTypes = {
-        messages: PropTypes.object
+        messages: PropTypes.object,
     };
 
     static defaultProps = {
@@ -38,68 +40,156 @@ class FilterField extends React.Component {
         onUpdateField: () => {},
         toggleMenu: () => {},
         onUpdateExceptionField: () => {},
-        onChangeCascadingValue: () => {}
+        onChangeCascadingValue: () => {},
+        fieldName: null,
+        fieldValue: null,
+        state: [0, 50],
     };
 
-    renderOperatorField = () => {
-        return (
-            <ComboField
-                fieldOptions= {this.props.operatorOptions}
-                fieldName="operator"
-                fieldRowId={this.props.filterField.rowId}
-                fieldValue={this.props.filterField.operator}
-                onUpdateField={this.updateFieldElement}/>
-        );
-    };
-
-    renderValueField = (selectedAttribute) => {
-        const valueElement = React.cloneElement(
-            React.Children.toArray(this.props.children).filter((node) => node.props.attType === selectedAttribute.type)[0],
-            assign({
-                fieldName: "value",
-                fieldRowId: this.props.filterField.rowId,
-                fieldValue: this.props.filterField.value,
-                fieldException: this.props.filterField.exception,
-                onUpdateField: this.updateFieldElement,
-                toggleMenu: this.props.toggleMenu,
-                maxFeaturesWPS: this.props.maxFeaturesWPS,
-                onUpdateExceptionField: this.updateExceptionFieldElement
-            }, selectedAttribute.fieldOptions || {})
-        );
-
-        return (
-            valueElement
-        );
-    };
+    
 
     render() {
-        let selectedAttribute = this.props.attributes.filter((attribute) => attribute.attribute === this.props.filterField.attribute)[0];
+        renderOperatorField = () => {
+            return (
+                <Slider
+                    range={{ min: 0, max: 1000000 }}
+                    start={[0, 1000000]}
+                    format={{
+                        from: (value) => Math.round(value),
+                        to: (value) => Math.round(value),
+                    }}
+                    
+                    margin={30}
+                    tooltips
+                    onSlide={(values, event) => {
+                        addOperator();
+                        onButtonClicked(values);
+                    }}
+                />
+            );
+        };
+
+        const addOperator = () => {
+            let attType = undefined;
+            let fieldName = this.props.operatorOptions[6];
+            let fieldRowId = this.props.filterField.rowId;
+            let name = "operator";
+            let fieldOptions = this.props.operatorOptions.map((attribute) => {
+                return attribute;
+            });
+
+            this.updateFieldElement(
+                fieldRowId,
+                name,
+                fieldName,
+                attType,
+                fieldOptions
+            );
+        };
+        const addAttribute = () => {
+            let selectedAttribute = this.props.attributes[7].attribute;
+            let attType = selectedAttribute && selectedAttribute.type;
+            let fieldName = this.props.attributes[7].attribute;
+            let fieldRowId = this.props.filterField.rowId;
+            let name = "attribute";
+            let fieldOptions = this.props.attributes.map((attribute) => {
+                return { id: attribute.attribute, name: attribute.label };
+            });
+
+            this.updateFieldElement(
+                fieldRowId,
+                name,
+                fieldName,
+                attType,
+                fieldOptions
+            );
+            addOperator();
+        };
+        const addLowerValue = (event) => {
+            let selectedValue = "number";
+            let attType = `values`;
+            let fieldName = { lowBound: event.target.value };
+            let fieldRowId = this.props.filterField.rowId;
+            let name = "value";
+            let fieldOptions;
+
+            this.updateFieldElement(
+                fieldRowId,
+                name,
+                fieldName,
+                selectedValue,
+                fieldOptions
+            );
+        };
+
+        const addUpperValue = (event) => {
+            let selectedValue = "number";
+            let attType = `values`;
+            let fieldName = { upBound: event.target.value };
+            let fieldRowId = this.props.filterField.rowId;
+            let name = "value";
+            let fieldOptions;
+
+            this.updateFieldElement(
+                fieldRowId,
+                name,
+                fieldName,
+                selectedValue,
+                fieldOptions
+            );
+        };
+
+        const onButtonClicked = (values) => {
+            let selectedValue = "number";
+            let attType = `values`;
+            let fieldName = { lowBound: values[0], upBound: values[1] };
+            let fieldRowId = this.props.filterField.rowId;
+            let name = "value";
+            let fieldOptions;
+
+            this.updateFieldElement(
+                fieldRowId,
+                name,
+                fieldName,
+                selectedValue,
+                fieldOptions
+            );
+        };
+
+        let selectedAttribute = this.props.attributes.filter(
+            (attribute) =>
+                attribute.attribute === this.props.filterField.attribute
+        )[0];
 
         return (
             <div className="container-fluid">
-                <Row className="filter-field-row">
-                    <Col xs={4}>
-                        <ComboField
-                            valueField={'id'}
-                            textField={'name'}
-                            fieldOptions={this.props.attributes.map((attribute) => { return {id: attribute.attribute, name: attribute.label}; })}
-                            placeholder={LocaleUtils.getMessageById(this.context.messages, "queryform.attributefilter.combo_placeholder")}
-                            fieldValue={this.props.filterField.attribute}
-                            attType={selectedAttribute && selectedAttribute.type}
-                            fieldName="attribute"
-                            fieldRowId={this.props.filterField.rowId}
-                            onUpdateField={this.updateFieldElement}
-                            comboFilter={"contains"}/>
-                    </Col>
-                    <Col xs={this.props.deleteButton ? 2 : 3}>{selectedAttribute ? this.renderOperatorField() : null}</Col>
-                    <Col xs={5}>{selectedAttribute && this.props.filterField.operator ? this.renderValueField(selectedAttribute) : null}</Col>
-                    {this.props.deleteButton ? <Col xs={1}>{this.props.deleteButton}</Col> : null}
-                    <Col> 
-                    <Slider 
-                    start={[127,10000]}
-                    range={{ min: 0, max: 255}}/> 
-                     </Col>
+                
+
+
+                <Row>
+                    <ComboField
+                        valueField={"id"}
+                        textField={"name"}
+                        fieldOptions={this.props.attributes.map((attribute) => {
+                            return {
+                                id: attribute.attribute,
+                                name: attribute.label,
+                            };
+                        })}
+                        placeholder={LocaleUtils.getMessageById(
+                            this.context.messages,
+                            "queryform.attributefilter.combo_placeholder"
+                        )}
+                        fieldValue={this.props.filterField.attribute}
+                        attType={selectedAttribute && selectedAttribute.type}
+                        fieldName="attribute"
+                        fieldRowId={this.props.filterField.rowId}
+                        onUpdateField={this.updateFieldElement}
+                        comboFilter={"contains"}
+                    />
                 </Row>
+
+                <Row>{selectedAttribute && selectedAttribute.type==="number" ? renderOperatorField() : null}</Row>
             </div>
         );
     }
@@ -111,16 +201,34 @@ class FilterField extends React.Component {
     updateFieldElement = (rowId, name, value, type, fieldOptions) => {
         let selectedAttribute;
         if (name === "attribute") {
-            selectedAttribute = this.props.attributes.filter((attribute) => attribute.attribute === value)[0];
-            this.props.onUpdateField(rowId, name, value, selectedAttribute && selectedAttribute.type || type, fieldOptions);
+            selectedAttribute = this.props.attributes.filter(
+                (attribute) => attribute.attribute === value
+            )[0];
+            this.props.onUpdateField(
+                rowId,
+                name,
+                value,
+                (selectedAttribute && selectedAttribute.type) || type,
+                fieldOptions
+            );
         } else {
-            this.props.onUpdateField(rowId, name, value, type === 'boolean' ? 'string' : type, fieldOptions);
-
+            this.props.onUpdateField(
+                rowId,
+                name,
+                value,
+                type === "boolean" ? "string" : type,
+                fieldOptions
+            );
         }
 
         if (name === "value") {
             // For cascading: filter the attributes that depends on
-            let dependsOnAttributes = this.props.attributes.filter((attribute) => attribute.dependson && attribute.dependson.field === this.props.filterField.attribute);
+            let dependsOnAttributes = this.props.attributes.filter(
+                (attribute) =>
+                    attribute.dependson &&
+                    attribute.dependson.field ===
+                        this.props.filterField.attribute
+            );
             if (dependsOnAttributes.length > 0) {
                 // Perhaps There is some filterFields that need to reset their value
                 this.props.onChangeCascadingValue(dependsOnAttributes);

@@ -15,6 +15,7 @@ const assign = require("object-assign");
 const LocaleUtils = require("../../MapStore2/web/client/utils/LocaleUtils");
 
 const Slider = require("react-nouislider");
+require('./style.css');
 
 class FilterField extends React.Component {
     static propTypes = {
@@ -130,10 +131,12 @@ class FilterField extends React.Component {
                 </Col>
                     {this.props.deleteButton ? <Col xs={1}>{this.props.deleteButton}</Col> : null}
                 </Row>
-
+            <div  className="container-fluid">
                 <Row> 
-                    <Col xs={10}>{selectedAttribute && selectedAttribute.type==="number" ? addSliderFilter() : null}</Col> 
+                    <Col xs={12}>{selectedAttribute && selectedAttribute.type==="number" ? addSliderFilter() : null}</Col> 
                 </Row>
+            </div>
+                
                 
             </div>
         );
